@@ -313,3 +313,4 @@ def test_non_existing_minified_file():
     assert_false(os.path.isfile(minified_file))
     call_command('compress_assets')
     assert_true(os.path.isfile(minified_file))
+    os.remove(minified_file)
