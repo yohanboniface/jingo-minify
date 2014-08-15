@@ -12,7 +12,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 import git
 
-from jingo_minify.utils import get_media_root
+from jingo_minify.utils import get_media_root, get_path
 
 
 path = lambda *a: os.path.join(get_media_root(), *a)
@@ -173,18 +173,17 @@ class Command(BaseCommand):  # pragma: no cover
 
         css_bin = ((filename.endswith('.less') and settings.LESS_BIN) or
                    (filename.endswith(('.sass', '.scss')) and settings.SASS_BIN))
+        fp = get_path(filename)
         if css_bin:
-            fp = path(filename.lstrip('/'))
             self._call('%s %s %s.css' % (css_bin, fp, fp),
                  shell=True, stdout=PIPE)
-            filename = '%s.css' % filename
+            fp = '%s.css' % fp
         elif filename.endswith('.styl'):
-            fp = path(filename.lstrip('/'))
             self._call('%s --include-css --include %s < %s > %s.css' %
                        (settings.STYLUS_BIN, os.path.dirname(fp), fp, fp),
                        shell=True, stdout=PIPE)
-            filename = '%s.css' % filename
-        return path(filename.lstrip('/'))
+            fp = '%s.css' % fp
+        return fp
 
     def _is_changed(self, concatted_file):
         """Check if the file has been changed."""
